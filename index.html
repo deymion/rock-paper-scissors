@@ -8,15 +8,44 @@
 </head>
 
 <body>
+    <div class="selection">
+        <button id="rock">Rock</button>
+        <button id="paper">Paper</button>
+        <button id="scissor">Scissor</button>
+    </div>
+    <div class="results">
+        <p class="player-score">Player Score: <span>0</span></p>
+        <p class="computer-score">Computer Score: <span>0</span></p>
+    </div>
     <script>
+        let scoreBoard = {
+            playerScore: 0,
+            computerScore: 0,
+            round: 0
+        };
+
+        const playerSelect = document.querySelector(".selection");
+        const roundDisplay = document.querySelector(".results");
+
+        playerSelect.addEventListener('click', (e) => {
+            const result = playRound(e.target.id, getComputerChoice());
+            updateScoreBoard(scoreBoard, result);
+            console.log(`Round ${scoreBoard.round} result: ${result}`);
+            console.log(scoreBoard);
+            displayScore();
+        })
+
         function getComputerChoice() {
             const choices = ["rock", "paper", "scissor"];
             return choices[Math.floor(Math.random() * 3)];
         }
+
         function playRound(playerSelection, computerSelection) {
             playerSelection = playerSelection.toLowerCase();
             computerSelection = computerSelection.toLowerCase();
 
+            // This Map object allows for quick lookups using 
+            // the player selection as the key.
             const winning_combinations = new Map();
             winning_combinations.set('rock', 'scissor');
             winning_combinations.set('paper', 'rock');
@@ -32,25 +61,41 @@
                 return "Computer Wins"
             }
         }
-        function playGame() {
-            let playerScore = 0,
-                computerScore = 0;
 
-            for (let i = 0; i < 5; i++) {
-                const playerSelection = prompt('Pick your choice: Rock, Paper, or Scissor?');
-                const computerSelection = getComputerChoice();
-                const roundResult = playRound(playerSelection, computerSelection);
-                if (roundResult === "Player Wins") {
-                    playerScore++;
-                } else if (roundResult === "Computer Wins") {
-                    computerScore++;
-                }
-                console.log(roundResult);
-                console.log(`Round ${i + 1}: player = ${playerScore} and computer = ${computerScore}`)
+        function updateScoreBoard(currentBoard, roundResult) {
+
+            if (roundResult === "Player Wins") {
+                currentBoard.playerScore++;
+            } else if (roundResult === "Computer Wins") {
+                currentBoard.computerScore++;
             }
+
+            currentBoard.round++;
+
+            return currentBoard;
         }
 
-        playGame();
+        function displayScore() {
+            const currentPlayerScore = document.querySelector(".player-score span");
+            const currentComputerScore = document.querySelector(".computer-score span");
+
+            currentPlayerScore.textContent = scoreBoard.playerScore;
+            currentComputerScore.textContent = scoreBoard.computerScore;
+
+            if (scoreBoard.round === 5) {
+                const paraWinner = document.createElement("p");
+
+                if (scoreBoard.playerScore === scoreBoard.computerScore) {
+                    paraWinner.textContent = "Draw";
+                } else if (scoreBoard.playerScore > scoreBoard.computerScore){
+                    paraWinner.textContent = "Player Wins";
+                } else {
+                    paraWinner.textContent = "Computer Wins";
+                }
+
+                roundDisplay.appendChild(paraWinner);
+            }
+        }
     </script>
 </body>
 
